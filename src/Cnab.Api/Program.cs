@@ -11,7 +11,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new()
     {
-        Title = "CNAB API - ByCodersTec Challenge",
+        Title = "CNAB API - Macksonnn",
         Version = "v1",
         Description = "API para importação e consulta de transações CNAB"
     });

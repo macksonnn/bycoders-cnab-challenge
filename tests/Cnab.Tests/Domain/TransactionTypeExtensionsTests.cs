@@ -19,10 +19,7 @@ public class TransactionTypeExtensionsTests
     [InlineData(TransactionType.Aluguel, false)]
     public void IsRevenue_ShouldReturnCorrectValue(TransactionType type, bool expectedIsRevenue)
     {
-        // Act
         var result = type.IsRevenue();
-
-        // Assert
         result.Should().Be(expectedIsRevenue);
     }
 
@@ -34,10 +31,7 @@ public class TransactionTypeExtensionsTests
     [InlineData(TransactionType.Aluguel, true)]
     public void IsExpense_ShouldReturnCorrectValue(TransactionType type, bool expectedIsExpense)
     {
-        // Act
         var result = type.IsExpense();
-
-        // Assert
         result.Should().Be(expectedIsExpense);
     }
 
@@ -50,10 +44,7 @@ public class TransactionTypeExtensionsTests
     [InlineData(TransactionType.Aluguel, -1)]
     public void GetSign_ShouldReturnCorrectValue(TransactionType type, int expectedSign)
     {
-        // Act
         var result = type.GetSign();
-
-        // Assert
         result.Should().Be(expectedSign);
     }
 }

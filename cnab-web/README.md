@@ -155,7 +155,7 @@ Certifique-se de que:
 
 MIT
 
-## ✨ Desenvolvido para
+## ✨ Author
 
-Desafio CNAB - ByCodersTec
+Developed by **Macksonnn** © 2025
 

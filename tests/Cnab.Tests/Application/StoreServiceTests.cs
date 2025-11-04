@@ -22,7 +22,6 @@ public class StoreServiceTests
     [Fact]
     public async Task GetStoresWithBalanceAsync_ShouldCalculateBalanceCorrectly()
     {
-        // Arrange
         var store = new Store
         {
             Id = 1,
@@ -30,9 +29,9 @@ public class StoreServiceTests
             Owner = "Dono Teste",
             Transactions = new List<Transaction>
             {
-                new Transaction { Id = 1, Type = TransactionType.Debito, Value = 100.00m, OccurredAt = DateTime.Now, Cpf = "123", Card = "456", StoreId = 1 }, // +100
-                new Transaction { Id = 2, Type = TransactionType.Boleto, Value = 50.00m, OccurredAt = DateTime.Now, Cpf = "123", Card = "456", StoreId = 1 },  // -50
-                new Transaction { Id = 3, Type = TransactionType.Credito, Value = 75.00m, OccurredAt = DateTime.Now, Cpf = "123", Card = "456", StoreId = 1 }  // +75
+                new Transaction { Id = 1, Type = TransactionType.Debito, Value = 100.00m, OccurredAt = DateTime.Now, Cpf = "123", Card = "456", StoreId = 1 },
+                new Transaction { Id = 2, Type = TransactionType.Boleto, Value = 50.00m, OccurredAt = DateTime.Now, Cpf = "123", Card = "456", StoreId = 1 },
+                new Transaction { Id = 3, Type = TransactionType.Credito, Value = 75.00m, OccurredAt = DateTime.Now, Cpf = "123", Card = "456", StoreId = 1 }
             }
         };
 
@@ -40,34 +39,28 @@ public class StoreServiceTests
             .Setup(r => r.GetAllWithTransactionsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Store> { store });
 
-        // Act
         var result = await _service.GetStoresWithBalanceAsync();
 
-        // Assert
         result.Should().HaveCount(1);
-        result[0].Balance.Should().Be(125.00m); // 100 - 50 + 75
+        result[0].Balance.Should().Be(125.00m);
         result[0].Transactions.Should().HaveCount(3);
     }
 
     [Fact]
     public async Task GetStoresWithBalanceAsync_EmptyDatabase_ShouldReturnEmptyList()
     {
-        // Arrange
         _storeRepositoryMock
             .Setup(r => r.GetAllWithTransactionsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Store>());
 
-        // Act
         var result = await _service.GetStoresWithBalanceAsync();
 
-        // Assert
         result.Should().BeEmpty();
     }
 
     [Fact]
     public async Task GetStoresWithBalanceAsync_MultipleStores_ShouldReturnAllStores()
     {
-        // Arrange
         var stores = new List<Store>
         {
             new Store
@@ -96,13 +89,11 @@ public class StoreServiceTests
             .Setup(r => r.GetAllWithTransactionsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(stores);
 
-        // Act
         var result = await _service.GetStoresWithBalanceAsync();
 
-        // Assert
         result.Should().HaveCount(2);
-        result[0].Balance.Should().Be(200.00m);  // Vendas = receita
-        result[1].Balance.Should().Be(-300.00m); // Aluguel = despesa
+        result[0].Balance.Should().Be(200.00m);
+        result[1].Balance.Should().Be(-300.00m);
     }
 }
 

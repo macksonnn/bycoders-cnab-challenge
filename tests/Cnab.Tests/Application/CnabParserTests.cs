@@ -10,16 +10,13 @@ public class CnabParserTests
     [Fact]
     public void ParseLine_ValidLine_ShouldParseCorrectly()
     {
-        // Arrange
-        var line = "3201903010000014200096206760174753****3153153453JOÃO MACEDO   BAR DO JOÃO       ";
+        var line = "3201903010000014200096206760174753****3153153453JOÃO MACEDO   BAR DO JOÃO        ";
 
-        // Act
         var result = CnabParser.ParseLine(line);
 
-        // Assert
         result.Should().NotBeNull();
         result.Type.Should().Be(TransactionType.Financiamento);
-        result.OccurredAt.Should().Be(new DateTime(2019, 3, 1, 15, 31, 53));
+        result.OccurredAt.Should().Be(new DateTime(2019, 3, 1, 15, 34, 53));
         result.Value.Should().Be(142.00m);
         result.Cpf.Should().Be("09620676017");
         result.Card.Should().Be("4753****3153");
@@ -30,13 +27,10 @@ public class CnabParserTests
     [Fact]
     public void ParseLine_AnotherValidLine_ShouldParseCorrectly()
     {
-        // Arrange
-        var line = "1201903010000023200055641815708231****1231JOSÉ COSTA    MERCEARIA 3 IRMÃOS";
+        var line = "1201903010000023200055641815708231****1231123100JOSÉ COSTA    MERCEARIA 3 IRMÃOS ";
 
-        // Act
         var result = CnabParser.ParseLine(line);
 
-        // Assert
         result.Type.Should().Be(TransactionType.Debito);
         result.OccurredAt.Should().Be(new DateTime(2019, 3, 1, 12, 31, 0));
         result.Value.Should().Be(232.00m);
@@ -49,13 +43,10 @@ public class CnabParserTests
     [Fact]
     public void ParseLine_EmptyLine_ShouldThrowException()
     {
-        // Arrange
         var line = "";
 
-        // Act
         Action act = () => CnabParser.ParseLine(line);
 
-        // Assert
         act.Should().Throw<ArgumentException>()
             .WithMessage("Linha CNAB não pode ser vazia.*");
     }
@@ -63,31 +54,22 @@ public class CnabParserTests
     [Fact]
     public void ParseLine_ShortLine_ShouldThrowException()
     {
-        // Arrange
-        var line = "123456789012345"; // Menos de 81 caracteres
+        var line = "123456789012345";
 
-        // Act
         Action act = () => CnabParser.ParseLine(line);
 
-        // Assert
         act.Should().Throw<ArgumentException>()
             .WithMessage("Linha CNAB deve ter no mínimo 81 caracteres.*");
     }
 
-    [Theory]
-    [InlineData("1201903010000050000")]
-    [InlineData("1201903010000012345")]
-    public void ParseLine_ValueParsing_ShouldDivideBy100(string valueInLine)
+    [Fact]
+    public void ParseLine_ValueDivisionBy100_ShouldWork()
     {
-        // Arrange - Construindo uma linha válida com o valor específico
-        var line = $"1{valueInLine}09620676017****3153153453JOÃO MACEDO   BAR DO JOÃO       ";
+        var line = "1201903010000050000096206760174753****3153123000JOÃO MACEDO   BAR DO JOÃO        ";
 
-        // Act
         var result = CnabParser.ParseLine(line);
 
-        // Assert
-        var expectedValue = decimal.Parse(valueInLine.Substring(8)) / 100m;
-        result.Value.Should().Be(expectedValue);
+        result.Value.Should().Be(500.00m);
     }
 }
 

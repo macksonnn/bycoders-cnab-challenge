@@ -1,4 +1,4 @@
-# CNAB System - ByCodersTec Challenge
+# CNAB System
 
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)
 ![Angular](https://img.shields.io/badge/Angular-17-DD0031?logo=angular)
@@ -310,9 +310,9 @@ If you encounter issues:
 
 MIT License - See [LICENSE](LICENSE) file for details.
 
-## ✨ Credits
+## ✨ Author
 
-Developed for the **ByCodersTec** technical challenge.
+Developed by **Macksonnn** © 2025
 
 ---
 

@@ -299,7 +299,7 @@ npm run build
 
 ---
 
-**Desenvolvido com ❤️ para o desafio CNAB - ByCodersTec** 🚀
+**Developed with ❤️ by Macksonnn** 🚀
 
 **Stack:** Angular 17 + TypeScript + SCSS + HttpClient  
 **Integração:** .NET 8 API + PostgreSQL  
