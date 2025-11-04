@@ -1,0 +1,86 @@
+<div class="store-list-container">
+    <div class="header-section">
+        <h2 class="section-title">🏪 Lojas e Transações</h2>
+        <button class="btn btn-primary" (click)="loadStores()" [disabled]="isLoading">
+            🔄 {{ isLoading ? 'Carregando...' : 'Atualizar' }}
+        </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading">
+        <div class="spinner"></div>
+        <p>Carregando dados...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !isLoading" class="alert alert-error">
+        {{ error }}
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && !error && stores.length === 0" class="empty-state card">
+        <div class="empty-icon">📭</div>
+        <h3>Nenhuma loja encontrada</h3>
+        <p>Importe um arquivo CNAB para começar</p>
+        <a routerLink="/upload" class="btn btn-primary">📤 Ir para Upload</a>
+    </div>
+
+    <!-- Store List -->
+    <div *ngIf="!isLoading && !error && stores.length > 0" class="stores-grid">
+        <div *ngFor="let store of stores" class="store-card card">
+            <div class="store-header" (click)="toggleStore(store.id)">
+                <div class="store-info">
+                    <h3 class="store-name">{{ store.name }}</h3>
+                    <p class="store-owner">👤 {{ store.owner }}</p>
+                </div>
+                <div class="store-balance" [class.positive]="store.balance >= 0" [class.negative]="store.balance < 0">
+                    {{ formatCurrency(store.balance) }}
+                </div>
+            </div>
+
+            <div class="store-body" *ngIf="isStoreExpanded(store.id)">
+                <div class="transactions-header">
+                    <h4>Transações ({{ store.transactions.length }})</h4>
+                </div>
+
+                <div class="transactions-table-container">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Data/Hora</th>
+                                <th>Valor</th>
+                                <th>CPF</th>
+                                <th>Cartão</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let transaction of store.transactions">
+                                <td>
+                                    <span class="transaction-type" [class.type-revenue]="isRevenue(transaction)"
+                                        [class.type-expense]="!isRevenue(transaction)">
+                                        {{ transaction.typeDescription }}
+                                    </span>
+                                </td>
+                                <td class="date-cell">{{ formatDate(transaction.occurredAt) }}</td>
+                                <td class="value-cell" [class.positive]="isRevenue(transaction)"
+                                    [class.negative]="!isRevenue(transaction)">
+                                    {{ formatCurrency(transaction.signedValue) }}
+                                </td>
+                                <td>{{ transaction.cpf }}</td>
+                                <td>{{ transaction.card }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="store-footer" (click)="toggleStore(store.id)">
+                <span class="toggle-text">
+                    {{ isStoreExpanded(store.id) ? '▲ Ocultar transações' : '▼ Ver ' + store.transactions.length + '
+                    transação(ões)' }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

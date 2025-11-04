@@ -1,0 +1,56 @@
+<div class="upload-container">
+    <div class="card">
+        <h2 class="section-title">📤 Importar Arquivo CNAB</h2>
+
+        <div class="upload-area" [class.dragging]="isDragging" [class.has-file]="selectedFile"
+            (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
+            (click)="fileInput.click()">
+
+            <div class="upload-icon">📁</div>
+
+            <p class="upload-text" *ngIf="!selectedFile">
+                <strong>Clique para selecionar</strong> ou arraste um arquivo CNAB aqui
+            </p>
+
+            <p class="upload-text selected" *ngIf="selectedFile">
+                <strong>Arquivo selecionado:</strong><br>
+                {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})
+            </p>
+
+            <p class="upload-hint">Formato: .txt com registros CNAB</p>
+
+            <input #fileInput type="file" accept=".txt" (change)="onFileSelected($event)" style="display: none">
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" [disabled]="!selectedFile || isUploading" (click)="uploadFile()">
+                <span *ngIf="!isUploading">Enviar Arquivo</span>
+                <span *ngIf="isUploading">Enviando...</span>
+            </button>
+
+            <button *ngIf="selectedFile && !isUploading" class="btn btn-secondary" (click)="clearFile()">
+                Limpar
+            </button>
+        </div>
+
+        <div *ngIf="message" class="alert" [class.alert-success]="message.type === 'success'"
+            [class.alert-error]="message.type === 'error'">
+            {{ message.text }}
+        </div>
+
+        <div *ngIf="isUploading" class="loading">
+            <div class="spinner"></div>
+            <p>Processando arquivo...</p>
+        </div>
+    </div>
+
+    <div class="card info-card">
+        <h3>ℹ️ Informações</h3>
+        <ul>
+            <li>O arquivo CNAB deve ser um arquivo de texto (.txt)</li>
+            <li>Cada linha deve ter 81 caracteres</li>
+            <li>Os campos devem estar nas posições corretas</li>
+            <li>Após o upload, os dados serão processados automaticamente</li>
+        </ul>
+    </div>
+</div>

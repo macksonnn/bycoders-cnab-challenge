@@ -1,0 +1,29 @@
+<div class="app-container">
+    <header class="header">
+        <div class="container">
+            <h1 class="header-title">📊 Sistema CNAB</h1>
+            <p class="header-subtitle">Importação e Gerenciamento de Transações Financeiras</p>
+
+            <nav class="nav">
+                <a routerLink="/upload" routerLinkActive="active" class="nav-link">
+                    📤 Upload
+                </a>
+                <a routerLink="/stores" routerLinkActive="active" class="nav-link">
+                    🏪 Lojas
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>CNAB Challenge - ByCodersTec © 2025</p>
+        </div>
+    </footer>
+</div>

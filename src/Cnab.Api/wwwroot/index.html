@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNAB - Sistema de Importação</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background: #eef1ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: #e3e7ff;
+            border-color: #764ba2;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .store-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .store-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .store-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .store-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .store-balance {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .store-balance.positive {
+            color: #28a745;
+            background: #d4edda;
+        }
+
+        .store-balance.negative {
+            color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .store-owner {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .transactions-table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .transactions-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .transactions-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .transaction-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .type-revenue {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .type-expense {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Sistema CNAB</h1>
+            <p>Importação e Gerenciamento de Transações Financeiras</p>
+        </div>
+
+        <div class="card">
+            <h2>📤 Importar Arquivo CNAB</h2>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <p><strong>Clique para selecionar</strong> ou arraste um arquivo CNAB aqui</p>
+                <p style="color: #999; font-size: 0.9em; margin-top: 10px;">Formato: .txt com registros CNAB</p>
+                <input type="file" id="fileInput" accept=".txt">
+            </div>
+            <button class="btn" id="uploadBtn" disabled>Enviar Arquivo</button>
+            <div class="message" id="uploadMessage"></div>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">🏪 Lojas e Transações</h2>
+                <button class="btn" id="refreshBtn">🔄 Atualizar</button>
+            </div>
+            <div id="storesContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Carregando dados...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let selectedFile = null;
+
+        // Elementos DOM
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadMessage = document.getElementById('uploadMessage');
+        const storesContainer = document.getElementById('storesContainer');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        // Upload area click
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // File selection
+        fileInput.addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                uploadArea.querySelector('p').innerHTML = `<strong>Arquivo selecionado:</strong> ${selectedFile.name}`;
+                uploadBtn.disabled = false;
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            selectedFile = e.dataTransfer.files[0];
+            if (selectedFile) {
+                fileInput.files = e.dataTransfer.files;
+                uploadArea.querySelector('p').innerHTML = `<strong>Arquivo selecionado:</strong> ${selectedFile.name}`;
+                uploadBtn.disabled = false;
+            }
+        });
+
+        // Upload button
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Enviando...';
+            showMessage('', '', false);
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch(`${API_URL}/api/cnab/import`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('Arquivo importado com sucesso!', 'success', true);
+                    selectedFile = null;
+                    fileInput.value = '';
+                    uploadArea.querySelector('p').innerHTML = '<strong>Clique para selecionar</strong> ou arraste um arquivo CNAB aqui';
+                    uploadBtn.disabled = true;
+                    uploadBtn.textContent = 'Enviar Arquivo';
+                    loadStores();
+                } else {
+                    showMessage(data.error || 'Erro ao importar arquivo', 'error', true);
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = 'Enviar Arquivo';
+                }
+            } catch (error) {
+                showMessage('Erro de conexão com o servidor', 'error', true);
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Enviar Arquivo';
+            }
+        });
+
+        // Refresh button
+        refreshBtn.addEventListener('click', loadStores);
+
+        // Show message
+        function showMessage(text, type, show) {
+            uploadMessage.textContent = text;
+            uploadMessage.className = `message ${type}`;
+            uploadMessage.style.display = show ? 'block' : 'none';
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date);
+        }
+
+        // Load stores
+        async function loadStores() {
+            storesContainer.innerHTML = '<div class="loading"><div class="spinner"></div>Carregando dados...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/stores`);
+                const stores = await response.json();
+
+                if (stores.length === 0) {
+                    storesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>Nenhuma loja encontrada</h3>
+                            <p>Importe um arquivo CNAB para começar</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                storesContainer.innerHTML = stores.map(store => `
+                    <div class="store-card">
+                        <div class="store-header">
+                            <div>
+                                <div class="store-name">${store.name}</div>
+                                <div class="store-owner">👤 ${store.owner}</div>
+                            </div>
+                            <div class="store-balance ${store.balance >= 0 ? 'positive' : 'negative'}">
+                                ${formatCurrency(store.balance)}
+                            </div>
+                        </div>
+                        <details>
+                            <summary style="cursor: pointer; color: #667eea; font-weight: 600; margin-bottom: 15px;">
+                                Ver ${store.transactions.length} transação(ões)
+                            </summary>
+                            <table class="transactions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Data/Hora</th>
+                                        <th>Valor</th>
+                                        <th>CPF</th>
+                                        <th>Cartão</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${store.transactions.map(t => `
+                                        <tr>
+                                            <td>
+                                                <span class="transaction-type ${t.signedValue >= 0 ? 'type-revenue' : 'type-expense'}">
+                                                    ${t.typeDescription}
+                                                </span>
+                                            </td>
+                                            <td>${formatDate(t.occurredAt)}</td>
+                                            <td style="font-weight: 600; color: ${t.signedValue >= 0 ? '#28a745' : '#dc3545'}">
+                                                ${formatCurrency(t.signedValue)}
+                                            </td>
+                                            <td>${t.cpf}</td>
+                                            <td>${t.card}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </details>
+                    </div>
+                `).join('');
+            } catch (error) {
+                storesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>Erro ao carregar dados</h3>
+                        <p>Verifique se a API está rodando</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load stores on page load
+        loadStores();
+    </script>
+</body>
+
+</html>
